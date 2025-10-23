@@ -1,0 +1,28 @@
+# Build artifacts
+bin/
+obj/
+
+# VS/IDE
+.vs/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+
+# Logs & caches
+*.log
+*.cache
+*.pid
+TestResult*
+
+# macOS
+.DS_Store
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# Others
+*.tmp
+~$*
