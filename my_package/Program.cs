@@ -12,8 +12,8 @@ namespace QuantBacktest
             Console.WriteLine("Backtest sur KFC & Starbucks (CSV utilisateur)");
 
             // 1) Chemins des datasets
-            string kfcCsv = "/Users/bettonthomas/Desktop/Dauphine/CSharp/Quant_trading_strategies_backtesing_CS/my_package/Docs/KFC Dataset.csv";
-            string sbuxCsv = "/Users/bettonthomas/Desktop/Dauphine/CSharp/Quant_trading_strategies_backtesing_CS/my_package/Docs/Starbucks Dataset.csv";
+            string kfcCsv = "Docs/KFC Dataset.csv";
+            string sbuxCsv = "Docs/Starbucks Dataset.csv";
             if (!File.Exists(kfcCsv)) { Console.WriteLine($"Introuvable: {kfcCsv}"); return; }
             if (!File.Exists(sbuxCsv)) { Console.WriteLine($"Introuvable: {sbuxCsv}"); return; }
 
