@@ -11,55 +11,111 @@ namespace QuantBacktest
         {
             Console.WriteLine("Backtest sur KFC & Starbucks (CSV utilisateur)");
 
-            // 1) Chemins des datasets
-            string kfcCsv = "Docs/KFC Dataset.csv";
-            string sbuxCsv = "Docs/Starbucks Dataset.csv";
+            // 1) Chemins des datasets - construire depuis la racine du repo
+            // AppContext.BaseDirectory est bin/Debug/net6.0, donc remonter 3 niveaux
+            string projectRoot = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
+            projectRoot = Path.GetFullPath(projectRoot);
+            string kfcCsv = Path.Combine(projectRoot, "Docs", "KFC Dataset.csv");
+            string sbuxCsv = Path.Combine(projectRoot, "Docs", "Starbucks Dataset.csv");
+            string nflxCsv = Path.Combine(projectRoot, "Docs", "nflx_2014_2023.csv");
             if (!File.Exists(kfcCsv)) { Console.WriteLine($"Introuvable: {kfcCsv}"); return; }
             if (!File.Exists(sbuxCsv)) { Console.WriteLine($"Introuvable: {sbuxCsv}"); return; }
+            if (!File.Exists(nflxCsv)) { Console.WriteLine($"Introuvable: {nflxCsv}"); return; }
 
             // 2) Normaliser au format attendu
             string dataDir = Path.Combine(AppContext.BaseDirectory, "data");
             Directory.CreateDirectory(dataDir);
             string kfcNorm = Path.Combine(dataDir, "KFC_normalized.csv");
             string sbuxNorm = Path.Combine(dataDir, "SBUX_normalized.csv");
+            string nflxNorm = Path.Combine(dataDir, "NFLX_normalized.csv");
             try { NormalizeCsvToExpectedFormat(kfcCsv, kfcNorm); Console.WriteLine($"CSV normalisé: {kfcNorm}"); }
             catch (Exception ex) { Console.WriteLine("Erreur normalisation KFC: " + ex.Message); return; }
             try { NormalizeCsvToExpectedFormat(sbuxCsv, sbuxNorm); Console.WriteLine($"CSV normalisé: {sbuxNorm}"); }
             catch (Exception ex) { Console.WriteLine("Erreur normalisation SBUX: " + ex.Message); return; }
+            try { NormalizeCsvToExpectedFormat(nflxCsv, nflxNorm); Console.WriteLine($"CSV normalisé: {nflxNorm}"); }
+            catch (Exception ex) { Console.WriteLine("Erreur normalisation NFLX: " + ex.Message); return; }
 
             // 3) Charger les données
             var donneesKfc = new DonneesMarche();
             var donneesSbux = new DonneesMarche();
+            var donneesNflx = new DonneesMarche();
             try { donneesKfc.ChargerDepuisCSV(kfcNorm); }
             catch (Exception ex) { Console.WriteLine("Erreur chargement KFC: " + ex.Message); return; }
             try { donneesSbux.ChargerDepuisCSV(sbuxNorm); }
             catch (Exception ex) { Console.WriteLine("Erreur chargement SBUX: " + ex.Message); return; }
+            try { donneesNflx.ChargerDepuisCSV(nflxNorm); }
+            catch (Exception ex) { Console.WriteLine("Erreur chargement NFLX: " + ex.Message); return; }
 
-            // 4) Stratégie avec cooldown
-            var strategie = new StrategieValue { MinIntervalEntreSignaux = TimeSpan.FromDays(60) };
+            // 4) Stratégies
+            var strategieValue = new StrategieValue { MinIntervalEntreSignaux = TimeSpan.FromDays(60) };
+            var strategieMomentum = new StrategieMomentum 
+            { 
+                PeriodVelocite = 10, 
+                PeriodAcceleration = 5,
+                SeuilAccelPositif = 0.001,
+                SeuilAccelNegatif = -0.001,
+                MinIntervalEntreSignaux = TimeSpan.FromDays(3)
+            };
 
-            // 5) Backtests individuels
-            var btKfc = new Backtester(strategie, donneesKfc) { RiskFreeRateAnnual = 0.02 };
-            btKfc.Executer();
-            Console.WriteLine("[KFC]");
-            btKfc.AfficherResultats();
-            Console.WriteLine($"Sharpe (KFC, annualisé) : {btKfc.ResultatPerformance.SharpeRatio:F2}");
+            // ============================================
+            // 5) BACKTESTS AVEC STRATÉGIE VALUE
+            // ============================================
+            Console.WriteLine("\n=== BACKTESTS STRATÉGIE VALUE ===\n");
+            
+            var btKfcValue = new Backtester(strategieValue, donneesKfc) { RiskFreeRateAnnual = 0.02 };
+            btKfcValue.Executer();
+            Console.WriteLine("[KFC - Value]");
+            btKfcValue.AfficherResultats();
+            Console.WriteLine($"Sharpe (KFC, annualisé) : {btKfcValue.ResultatPerformance.SharpeRatio:F2}");
 
-            var btSbux = new Backtester(strategie, donneesSbux) { RiskFreeRateAnnual = 0.02 };
-            btSbux.Executer();
-            Console.WriteLine("[SBUX]");
-            btSbux.AfficherResultats();
-            Console.WriteLine($"Sharpe (SBUX, annualisé) : {btSbux.ResultatPerformance.SharpeRatio:F2}");
+            var btSbuxValue = new Backtester(strategieValue, donneesSbux) { RiskFreeRateAnnual = 0.02 };
+            btSbuxValue.Executer();
+            Console.WriteLine("\n[SBUX - Value]");
+            btSbuxValue.AfficherResultats();
+            Console.WriteLine($"Sharpe (SBUX, annualisé) : {btSbuxValue.ResultatPerformance.SharpeRatio:F2}");
 
-            // 6) Portefeuille KFC + SBUX
-            var pf = new PortefeuilleBacktester(strategie);
+            var btNflxValue = new Backtester(strategieValue, donneesNflx) { RiskFreeRateAnnual = 0.02 };
+            btNflxValue.Executer();
+            Console.WriteLine("\n[NFLX - Value]");
+            btNflxValue.AfficherResultats();
+            Console.WriteLine($"Sharpe (NFLX, annualisé) : {btNflxValue.ResultatPerformance.SharpeRatio:F2}");
+
+            // ============================================
+            // 6) BACKTESTS AVEC STRATÉGIE MOMENTUM
+            // ============================================
+            Console.WriteLine("\n\n=== BACKTESTS STRATÉGIE MOMENTUM ===\n");
+            
+            var btKfcMomentum = new Backtester(strategieMomentum, donneesKfc) { RiskFreeRateAnnual = 0.02 };
+            btKfcMomentum.Executer();
+            Console.WriteLine("[KFC - Momentum]");
+            btKfcMomentum.AfficherResultats();
+            Console.WriteLine($"Sharpe (KFC, annualisé) : {btKfcMomentum.ResultatPerformance.SharpeRatio:F2}");
+
+            var btSbuxMomentum = new Backtester(strategieMomentum, donneesSbux) { RiskFreeRateAnnual = 0.02 };
+            btSbuxMomentum.Executer();
+            Console.WriteLine("\n[SBUX - Momentum]");
+            btSbuxMomentum.AfficherResultats();
+            Console.WriteLine($"Sharpe (SBUX, annualisé) : {btSbuxMomentum.ResultatPerformance.SharpeRatio:F2}");
+
+            var btNflxMomentum = new Backtester(strategieMomentum, donneesNflx) { RiskFreeRateAnnual = 0.02 };
+            btNflxMomentum.Executer();
+            Console.WriteLine("\n[NFLX - Momentum]");
+            btNflxMomentum.AfficherResultats();
+            Console.WriteLine($"Sharpe (NFLX, annualisé) : {btNflxMomentum.ResultatPerformance.SharpeRatio:F2}");
+
+            // ============================================
+            // 7) Portefeuille KFC + SBUX + NFLX (Stratégie Value)
+            // ============================================
+            Console.WriteLine("\n\n=== PORTEFEUILLE (KFC + SBUX + NFLX) - STRATÉGIE VALUE ===\n");
+            var pf = new PortefeuilleBacktester(strategieValue);
             File.Copy(kfcNorm, Path.Combine(dataDir, "KFC.csv"), overwrite: true);
             File.Copy(sbuxNorm, Path.Combine(dataDir, "SBUX.csv"), overwrite: true);
-            pf.ChargerDonnees(dataDir, new List<string> { "KFC", "SBUX" });
+            File.Copy(nflxNorm, Path.Combine(dataDir, "NFLX.csv"), overwrite: true);
+            pf.ChargerDonnees(dataDir, new List<string> { "KFC", "SBUX", "NFLX" });
             pf.Executer();
             pf.AfficherResultatsGlobaux();
 
-            Console.WriteLine("Backtest terminé.");
+            Console.WriteLine("\n✓ Backtest terminé.");
         }
 
         // Normalise un CSV hétérogène (en-têtes différents) vers: Date,Open,High,Low,Close,Volume
