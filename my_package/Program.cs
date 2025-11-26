@@ -18,9 +18,11 @@ namespace QuantBacktest
             string kfcCsv = Path.Combine(projectRoot, "Docs", "KFC Dataset.csv");
             string sbuxCsv = Path.Combine(projectRoot, "Docs", "Starbucks Dataset.csv");
             string nflxCsv = Path.Combine(projectRoot, "Docs", "nflx_2014_2023.csv");
+            string aaplCsv = Path.Combine(projectRoot, "Docs", "aapl_2014_2023.csv");
             if (!File.Exists(kfcCsv)) { Console.WriteLine($"Introuvable: {kfcCsv}"); return; }
             if (!File.Exists(sbuxCsv)) { Console.WriteLine($"Introuvable: {sbuxCsv}"); return; }
             if (!File.Exists(nflxCsv)) { Console.WriteLine($"Introuvable: {nflxCsv}"); return; }
+            if (!File.Exists(aaplCsv)) { Console.WriteLine($"Introuvable: {aaplCsv}"); return; }
 
             // 2) Normaliser au format attendu
             string dataDir = Path.Combine(AppContext.BaseDirectory, "data");
@@ -28,23 +30,29 @@ namespace QuantBacktest
             string kfcNorm = Path.Combine(dataDir, "KFC_normalized.csv");
             string sbuxNorm = Path.Combine(dataDir, "SBUX_normalized.csv");
             string nflxNorm = Path.Combine(dataDir, "NFLX_normalized.csv");
+            string aaplNorm = Path.Combine(dataDir, "AAPL_normalized.csv");
             try { NormalizeCsvToExpectedFormat(kfcCsv, kfcNorm); Console.WriteLine($"CSV normalisé: {kfcNorm}"); }
             catch (Exception ex) { Console.WriteLine("Erreur normalisation KFC: " + ex.Message); return; }
             try { NormalizeCsvToExpectedFormat(sbuxCsv, sbuxNorm); Console.WriteLine($"CSV normalisé: {sbuxNorm}"); }
             catch (Exception ex) { Console.WriteLine("Erreur normalisation SBUX: " + ex.Message); return; }
             try { NormalizeCsvToExpectedFormat(nflxCsv, nflxNorm); Console.WriteLine($"CSV normalisé: {nflxNorm}"); }
             catch (Exception ex) { Console.WriteLine("Erreur normalisation NFLX: " + ex.Message); return; }
+            try { NormalizeCsvToExpectedFormat(aaplCsv, aaplNorm); Console.WriteLine($"CSV normalisé: {aaplNorm}"); }
+            catch (Exception ex) { Console.WriteLine("Erreur normalisation AAPL: " + ex.Message); return; }
 
             // 3) Charger les données
             var donneesKfc = new DonneesMarche();
             var donneesSbux = new DonneesMarche();
             var donneesNflx = new DonneesMarche();
+            var donneesAapl = new DonneesMarche();
             try { donneesKfc.ChargerDepuisCSV(kfcNorm); }
             catch (Exception ex) { Console.WriteLine("Erreur chargement KFC: " + ex.Message); return; }
             try { donneesSbux.ChargerDepuisCSV(sbuxNorm); }
             catch (Exception ex) { Console.WriteLine("Erreur chargement SBUX: " + ex.Message); return; }
             try { donneesNflx.ChargerDepuisCSV(nflxNorm); }
             catch (Exception ex) { Console.WriteLine("Erreur chargement NFLX: " + ex.Message); return; }
+            try { donneesAapl.ChargerDepuisCSV(aaplNorm); }
+            catch (Exception ex) { Console.WriteLine("Erreur chargement AAPL: " + ex.Message); return; }
 
             // 4) Stratégies
             var strategieValue = new StrategieValue { MinIntervalEntreSignaux = TimeSpan.FromDays(60) };
@@ -80,6 +88,12 @@ namespace QuantBacktest
             btNflxValue.AfficherResultats();
             Console.WriteLine($"Sharpe (NFLX, annualisé) : {btNflxValue.ResultatPerformance.SharpeRatio:F2}");
 
+            var btAaplValue = new Backtester(strategieValue, donneesAapl) { RiskFreeRateAnnual = 0.02 };
+            btAaplValue.Executer();
+            Console.WriteLine("\n[AAPL - Value]");
+            btAaplValue.AfficherResultats();
+            Console.WriteLine($"Sharpe (AAPL, annualisé) : {btAaplValue.ResultatPerformance.SharpeRatio:F2}");
+
             // ============================================
             // 6) BACKTESTS AVEC STRATÉGIE MOMENTUM
             // ============================================
@@ -102,6 +116,12 @@ namespace QuantBacktest
             Console.WriteLine("\n[NFLX - Momentum]");
             btNflxMomentum.AfficherResultats();
             Console.WriteLine($"Sharpe (NFLX, annualisé) : {btNflxMomentum.ResultatPerformance.SharpeRatio:F2}");
+
+            var btAaplMomentum = new Backtester(strategieMomentum, donneesAapl) { RiskFreeRateAnnual = 0.02 };
+            btAaplMomentum.Executer();
+            Console.WriteLine("\n[AAPL - Momentum]");
+            btAaplMomentum.AfficherResultats();
+            Console.WriteLine($"Sharpe (AAPL, annualisé) : {btAaplMomentum.ResultatPerformance.SharpeRatio:F2}");
 
             // ============================================
             // 7) Portefeuille KFC + SBUX + NFLX (Stratégie Value)
