@@ -40,43 +40,60 @@ my_package.Tests/
 
 ## Prérequis
 
-- .NET 6.0 Obligatoirement
+- .NET 6.0 ou supérieur
 - Fichiers CSV de données de marché (format : Date,Open,High,Low,Close,Volume)
 
-## Installation et lancement
+## 🚀 Démarrage rapide
+
+**Pour cloner et lancer le projet en 4 commandes :**
+
+```bash
+git clone https://github.com/Thomasbttn1/Quant-Trading-Strategies-Backtesting-in-C-.git
+cd Quant-Trading-Strategies-Backtesting-in-C-/my_package
+dotnet restore
+dotnet run
+```
+
+C'est tout ! Les backtests s'exécuteront et afficheront les résultats en console.
+
+---
+
+## Installation détaillée
 
 ### 1. Cloner le projet
 
 ```bash
 git clone https://github.com/Thomasbttn1/Quant-Trading-Strategies-Backtesting-in-C-.git
 cd Quant-Trading-Strategies-Backtesting-in-C-
-git checkout PedroMomentum
 ```
 
-### 2. Restaurer les dépendances
+### 2. Accéder au dossier du projet
 
 ```bash
 cd my_package
+```
+
+### 3. Restaurer les dépendances
+
+```bash
 dotnet restore
 ```
 
-### 3. Lancer le projet
+### 4. Lancer le projet
 
 ```bash
 dotnet run
 ```
 
-Cela exécutera les backtests sur les données disponibles et affichera les résultats en console.
+Les backtests s'exécuteront et afficheront les résultats en console.
 
-### 4. Builder le projet
+### 5. Builder le projet (optionnel)
 
 ```bash
 dotnet build
 ```
 
-### 5. Lancer les tests
-
-Si des tests sont présents, les exécuter avec :
+### 6. Lancer les tests unitaires (optionnel)
 
 ```bash
 dotnet test
