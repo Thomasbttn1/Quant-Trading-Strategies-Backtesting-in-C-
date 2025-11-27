@@ -5,9 +5,7 @@ using System.Linq;
 
 namespace QuantBacktest
 {
-    /// <summary>
-    /// Gère l’exécution d’une stratégie sur plusieurs actifs (portefeuille).
-    /// </summary>
+    // Gère le backtest sur plusieurs actifs en portefeuille
     public class PortefeuilleBacktester
     {
         public StrategieTrading Strategie { get; private set; }
@@ -20,9 +18,7 @@ namespace QuantBacktest
             Strategie = strategie;
         }
 
-        /// <summary>
-        /// Charge les données de plusieurs fichiers CSV correspondant à différents tickers.
-        /// </summary>
+        // Charge les données CSV pour chaque titre
         public void ChargerDonnees(string dossierData, List<string> tickers)
         {
             foreach (var ticker in tickers)
@@ -36,9 +32,7 @@ namespace QuantBacktest
             }
         }
 
-        /// <summary>
-        /// Exécute la stratégie sur chaque actif du portefeuille.
-        /// </summary>
+        // Exécute la stratégie sur tous les actifs du portefeuille
         public void Executer()
         {
             Backtests.Clear();
@@ -60,9 +54,7 @@ namespace QuantBacktest
             }
         }
 
-        /// <summary>
-        /// Calcule la performance moyenne et globale du portefeuille.
-        /// </summary>
+        // Affiche les résultats moyens du portefeuille
         public void AfficherResultatsGlobaux()
         {
             Console.WriteLine("=== Résultats du portefeuille ===");

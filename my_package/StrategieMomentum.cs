@@ -4,12 +4,8 @@ using System.Linq;
 
 namespace QuantBacktest
 {
-    /// <summary>
-    /// Stratégie de Momentum basique basée sur l'accélération du prix.
-    /// - Achète quand l'accélération est positive (prix s'accélère à la hausse)
-    /// - Vend quand l'accélération est négative (prix s'accélère à la baisse)
-    /// - Utilise des moyennes mobales pour calculer la vélocité et l'accélération
-    /// </summary>
+    // Stratégie basée sur l'accélération du prix
+    // Achète quand le prix s'accélère à la hausse, vend quand il s'accélère à la baisse
     public class StrategieMomentum : StrategieTrading
     {
         // Période pour calculer la vélocité (changement de prix)

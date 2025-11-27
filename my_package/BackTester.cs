@@ -4,10 +4,7 @@ using System.Linq;
 
 namespace QuantBacktest
 {
-    /// <summary>
-    /// Classe responsable d’exécuter une stratégie de trading sur des données historiques
-    /// et de calculer les performances résultantes.
-    /// </summary>
+    // Exécute le backtest d'une stratégie et calcule les performances
     public class Backtester
     {
         public StrategieTrading Strategie { get; private set; }
@@ -23,9 +20,7 @@ namespace QuantBacktest
             Donnees = donnees;
         }
 
-        /// <summary>
-        /// Exécute le backtest complet : signaux → transactions → performance.
-        /// </summary>
+        // Lance le backtest : génère signaux, crée transactions, calcule la performance
         public void Executer()
         {
             var signaux = Strategie.GenererSignaux(Donnees);
@@ -62,11 +57,8 @@ namespace QuantBacktest
             ResultatPerformance = CalculerPerformance();
         }
 
-        /// <summary>
-        /// Calcule les indicateurs de performance du backtest :
-        /// rendement cumulé, drawdown max, taux de réussite.
-        /// </summary>
-    private Performance CalculerPerformance()
+        // Calcule les indicateurs : rendement, drawdown, taux de réussite
+        private Performance CalculerPerformance()
         {
             if (Transactions.Count == 0)
         return new Performance(0, 0, 0, 0, 0);
@@ -144,9 +136,7 @@ namespace QuantBacktest
             return new Performance(rendementTotal, drawdownMax, tauxReussite, Transactions.Count, sharpe);
         }
 
-        /// <summary>
-        /// Affiche un résumé du backtest dans la console.
-        /// </summary>
+        // Affiche un résumé des résultats
         public void AfficherResultats()
         {
             Console.WriteLine($"--- Résultats du Backtest : {Strategie.Nom} ---");

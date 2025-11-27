@@ -11,11 +11,7 @@ namespace QuantBacktest
 
         public DonneesMarche() { }
 
-        /// <summary>
-        /// Charge les données de marché à partir d’un fichier CSV.
-        /// Format attendu : Date,Open,High,Low,Close,Volume
-        /// </summary>
-        /// <param name="cheminFichier">Chemin du fichier CSV</param>
+        // Charge les données depuis un fichier CSV
         public void ChargerDepuisCSV(string cheminFichier)
         {
             if (!File.Exists(cheminFichier))
@@ -65,19 +61,13 @@ namespace QuantBacktest
             }
         }
 
-        /// <summary>
-        /// Retourne le nombre total de cotations chargées.
-        /// </summary>
+        // Nombre total de cotations
         public int NombreDeJours => Cotations.Count;
 
-        /// <summary>
-        /// Retourne la première date disponible dans les données.
-        /// </summary>
+        // Date de début des données
         public DateTime DateDebut => Cotations.Count > 0 ? Cotations[0].Date : DateTime.MinValue;
 
-        /// <summary>
-        /// Retourne la dernière date disponible dans les données.
-        /// </summary>
+        // Date de fin des données
         public DateTime DateFin => Cotations.Count > 0 ? Cotations[^1].Date : DateTime.MinValue;
 
         public override string ToString()
