@@ -54,7 +54,7 @@ dotnet restore
 dotnet run
 ```
 
-C'est tout ! Les backtests s'exécuteront et afficheront les résultats en console.
+Les backtests s'exécuteront et afficheront les résultats en console.
 
 ---
 
